@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
-    <header class="bg-blue-600 text-white p-4 shadow-md">
+    <header class="bg-blue-600 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-xl font-semibold">School Management System</h1>
             <nav>
