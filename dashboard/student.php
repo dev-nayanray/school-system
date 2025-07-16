@@ -37,11 +37,12 @@ if ($student_profile['class_id'] ?? null) {
 $all_marks = [];
 if ($student_profile_id) {
     $stmt = $pdo->prepare('
-        SELECT m.marks_obtained, m.exam_type, m.exam_date, s.subject_name, s.id as subject_id
-        FROM marks m
-        JOIN subjects s ON m.subject_id = s.id
-        WHERE m.student_id = ?
-        ORDER BY m.exam_date DESC
+        SELECT er.marks_obtained, e.exam_name, s.subject_name, er.id as result_id
+        FROM exam_results er
+        JOIN exams e ON er.exam_id = e.id
+        JOIN subjects s ON er.subject_id = s.id
+        WHERE er.student_id = ?
+        ORDER BY e.start_date DESC
     ');
     $stmt->execute([$student_profile_id]);
     $all_marks = $stmt->fetchAll();
@@ -56,6 +57,48 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute();
 $announcements = $stmt->fetchAll();
+
+// Fetch exam routines for student's class
+$exam_routines = [];
+if ($student_profile['class_id'] ?? null) {
+    $stmt = $pdo->prepare('
+        SELECT er.*, e.exam_name, s.subject_name
+        FROM exam_routines er
+        JOIN exams e ON er.exam_id = e.id
+        JOIN subjects s ON er.subject_id = s.id
+        WHERE er.class_id = ?
+        ORDER BY er.exam_date ASC
+    ');
+    $stmt->execute([$student_profile['class_id']]);
+    $exam_routines = $stmt->fetchAll();
+}
+
+// Fetch fees for student
+$student_fees = [];
+if ($student_profile_id) {
+    $stmt = $pdo->prepare('
+        SELECT sf.id as student_fee_id, ft.name as fee_type_name, f.amount, sf.amount_paid, sf.payment_status
+        FROM student_fees sf
+        JOIN fees f ON sf.fee_id = f.id
+        JOIN fee_types ft ON f.fee_type_id = ft.id
+        WHERE sf.student_id = ?
+    ');
+    $stmt->execute([$student_profile_id]);
+    $student_fees = $stmt->fetchAll();
+}
+
+// Fetch fees for student's class (not assigned individually)
+$class_fees = [];
+if ($student_profile['class_id'] ?? null) {
+    $stmt = $pdo->prepare('
+        SELECT DISTINCT ft.name as fee_type_name, f.amount, f.due_date
+        FROM fees f
+        JOIN fee_types ft ON f.fee_type_id = ft.id
+        WHERE f.class_id = ? OR f.class_id IS NULL
+    ');
+    $stmt->execute([$student_profile['class_id']]);
+    $class_fees = $stmt->fetchAll();
+}
 
 // Calculate statistics
 $overall_performance = 0;
@@ -123,6 +166,7 @@ if (!empty($all_marks)) {
                 </div>
             </div>
 
+
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-md p-6 text-white">
@@ -143,6 +187,8 @@ if (!empty($all_marks)) {
                         </div>
                     </div>
                 </div>
+
+              
 
                 <div class="bg-white rounded-xl shadow-md p-6">
                     <div class="flex justify-between items-center">
@@ -187,12 +233,40 @@ if (!empty($all_marks)) {
                         </div>
                     </div>
                 </div>
+                <!-- Class Fees -->
+                
             </div>
 
             <!-- Main content grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
                 <!-- Left column -->
                 <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white rounded-xl shadow-md p-6 overflow-x-auto">
+                    <h2 class="text-xl font-bold mb-4">All  Fees</h2>
+                    <?php if (!empty($class_fees)): ?>
+                        <table class="min-w-full divide-y divide-gray-200 table-auto">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fee Type</th>
+                                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Amount</th>
+                                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Due Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <?php foreach ($class_fees as $fee): ?>
+                                    <tr class="hover:bg-gray-100">
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($fee['fee_type_name']); ?></td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700"><?php echo number_format($fee['amount'], 2); ?></td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700"><?php echo !empty($fee['due_date']) ? htmlspecialchars($fee['due_date']) : '<span class="text-gray-400 italic">No due date</span>'; ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p class="text-gray-500">No fees assigned for your class.</p>
+                    <?php endif; ?>
+                </div>
                     <!-- Subject Performance Chart -->
                     <div class="bg-white rounded-xl shadow-md p-6">
                         <div class="flex justify-between items-center mb-6">

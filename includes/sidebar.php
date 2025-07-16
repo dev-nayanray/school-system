@@ -11,11 +11,17 @@ switch ($role) {
     case 'admin':
         $menu_items = [
             'Dashboard' => ['link' => '../dashboard/admin.php', 'icon' => 'grid'],
-            'Manage Users' => ['link' => '../dashboard/admin_manage_users.php', 'icon' => 'users'],
-            'Classes' => ['link' => '../dashboard/admin_classes.php', 'icon' => 'book-open'],
-            'Subjects' => ['link' => '../dashboard/admin_subjects.php', 'icon' => 'book'],
-            'Announcements' => ['link' => '../dashboard/admin_announcements.php', 'icon' => 'bell'],
-            'Settings' => ['link' => '../dashboard/settings.php', 'icon' => 'settings']
+        'Manage Users' => ['link' => '../dashboard/admin_manage_users.php', 'icon' => 'users'],
+        'Classes' => ['link' => '../dashboard/admin_classes.php', 'icon' => 'book-open'],
+        'Subjects' => ['link' => '../dashboard/admin_subjects.php', 'icon' => 'book'],
+        'Teachers' => ['link' => '../dashboard/admin_teacher.php', 'icon' => 'user'],
+        'Students' => ['link' => '../dashboard/admin_student.php', 'icon' => 'user'],
+        'Fees Management' => ['link' => '../dashboard/admin_fees.php', 'icon' => 'dollar-sign'],
+        'Payment Management' => ['link' => '../dashboard/admin_payments.php', 'icon' => 'credit-card'],
+        'Exam Management' => ['link' => '../dashboard/admin_exams.php', 'icon' => 'file-text'],
+        'Result Management' => ['link' => '../dashboard/admin_results.php', 'icon' => 'award'],
+        'Announcements' => ['link' => '../dashboard/admin_announcements.php', 'icon' => 'bell'],
+        'Settings' => ['link' => '../dashboard/settings.php', 'icon' => 'settings']
         ];
         break;
     case 'teacher':
@@ -31,6 +37,7 @@ switch ($role) {
         $menu_items = [
             'Dashboard' => ['link' => '../dashboard/student.php', 'icon' => 'grid'],
             'Marks' => ['link' => '../dashboard/student_marks.php', 'icon' => 'bar-chart-2'],
+            'Payments' => ['link' => '../dashboard/student_payment.php', 'icon' => 'bar-chart-2'],
             'Schedule' => ['link' => '../dashboard/student_schedule.php', 'icon' => 'calendar'],
             'Profile' => ['link' => '../dashboard/student_profile.php', 'icon' => 'user'],
             'Announcements' => ['link' => '../dashboard/announcements.php', 'icon' => 'bell'],
