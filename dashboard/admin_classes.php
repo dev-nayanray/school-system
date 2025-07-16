@@ -37,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
         $errors[] = "Invalid request";
     } else {
         $class_name = trim($_POST['class_name'] ?? '');
+        $room_no = trim($_POST['room_no'] ?? '');
         $class_id = $_POST['class_id'] ?? null;
 
         if (!$class_name) {
@@ -47,17 +48,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
             try {
                 if ($class_id) {
                     // Update class
-                    $stmt = $pdo->prepare('UPDATE classes SET class_name = ? WHERE id = ?');
-                    $stmt->execute([$class_name, $class_id]);
+                    $stmt = $pdo->prepare('UPDATE classes SET class_name = ?, room_no = ? WHERE id = ?');
+                    $stmt->execute([$class_name, $room_no, $class_id]);
                     $success = 'Class updated successfully.';
                 } else {
                     // Insert new class
-                    $stmt = $pdo->prepare('INSERT INTO classes (class_name) VALUES (?)');
-                    $stmt->execute([$class_name]);
+                    $stmt = $pdo->prepare('INSERT INTO classes (class_name, room_no) VALUES (?, ?)');
+                    $stmt->execute([$class_name, $room_no]);
                     $success = 'Class added successfully.';
                     
                     // Clear form after adding
                     $_POST['class_name'] = '';
+                    $_POST['room_no'] = '';
                 }
             } catch (PDOException $e) {
                 $errors[] = "Database error: " . $e->getMessage();
@@ -150,37 +152,47 @@ if (isset($_SESSION['success'])) {
                                 </div>
                             <?php endif; ?>
 
-                            <form action="admin_classes.php<?php echo $edit_class ? '?edit=' . $edit_class['id'] : ''; ?>" method="post" class="space-y-4">
-                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                                <input type="hidden" name="class_id" value="<?php echo $edit_class['id'] ?? ''; ?>" />
-                                
-                                <div>
-                                    <label for="class_name" class="block text-sm font-medium text-gray-700 mb-1">Class Name</label>
-                                    <div class="relative">
-                                        <input type="text" id="class_name" name="class_name" required 
-                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition"
-                                               value="<?php echo htmlspecialchars($edit_class['class_name'] ?? $_POST['class_name'] ?? ''); ?>"
-                                               placeholder="e.g., Grade 10, Year 11, etc.">
-                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="pt-4">
-                                    <button type="submit" name="submit" class="w-full px-6 py-3 border border-transparent rounded-lg shadow-sm text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-medium transition transform hover:-translate-y-0.5">
-                                        <?php echo $edit_class ? 'Update Class' : 'Add Class'; ?>
-                                    </button>
-                                    
-                                    <?php if ($edit_class): ?>
-                                        <a href="admin_classes.php" class="mt-3 w-full block text-center px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
-                                            Cancel Edit
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                            </form>
+<form action="admin_classes.php<?php echo $edit_class ? '?edit=' . $edit_class['id'] : ''; ?>" method="post" class="space-y-4">
+    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+    <input type="hidden" name="class_id" value="<?php echo $edit_class['id'] ?? ''; ?>" />
+    
+    <div>
+        <label for="class_name" class="block text-sm font-medium text-gray-700 mb-1">Class Name</label>
+        <div class="relative">
+            <input type="text" id="class_name" name="class_name" required 
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition"
+                   value="<?php echo htmlspecialchars($edit_class['class_name'] ?? $_POST['class_name'] ?? ''); ?>"
+                   placeholder="e.g., Grade 10, Year 11, etc.">
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <label for="room_no" class="block text-sm font-medium text-gray-700 mb-1">Room Number</label>
+        <div class="relative">
+            <input type="text" id="room_no" name="room_no" 
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition"
+                   value="<?php echo htmlspecialchars($edit_class['room_no'] ?? $_POST['room_no'] ?? ''); ?>"
+                   placeholder="e.g., Room 101, Lab A, etc.">
+        </div>
+    </div>
+    
+    <div class="pt-4">
+        <button type="submit" name="submit" class="w-full px-6 py-3 border border-transparent rounded-lg shadow-sm text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-medium transition transform hover:-translate-y-0.5">
+            <?php echo $edit_class ? 'Update Class' : 'Add Class'; ?>
+        </button>
+        
+        <?php if ($edit_class): ?>
+            <a href="admin_classes.php" class="mt-3 w-full block text-center px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                Cancel Edit
+            </a>
+        <?php endif; ?>
+    </div>
+</form>
                         </div>
                     </div>
                     
@@ -224,58 +236,62 @@ if (isset($_SESSION['success'])) {
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class Name</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <?php foreach ($classes as $class): ?>
-                                        <tr class="hover:bg-gray-50 transition-colors">
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <div class="bg-blue-100 p-2 rounded-lg mr-3">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path d="M12 14l9-5-9-5-9 5 9 5z" />
-                                                            <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
-                                                        </svg>
-                                                    </div>
-                                                    <div>
-                                                        <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($class['class_name']); ?></div>
-                                                        <div class="text-sm text-gray-500"><?php echo $class['students_count'] ?? 0; ?> students</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                    ID: <?php echo $class['id']; ?>
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <div class="flex justify-end space-x-2">
-                                                    <a href="admin_classes.php?edit=<?php echo $class['id']; ?>" class="text-blue-600 hover:text-blue-900 transition-colors p-2 rounded-lg hover:bg-blue-50" title="Edit">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                                        </svg>
-                                                    </a>
-                                                    
-                                                    <form method="post" class="inline" onsubmit="return confirm('Are you sure you want to delete this class? All related subjects and student data will be permanently removed.');">
-                                                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                                                        <input type="hidden" name="delete_id" value="<?php echo $class['id']; ?>">
-                                                        <button type="submit" name="delete" class="text-red-600 hover:text-red-900 transition-colors p-2 rounded-lg hover:bg-red-50" title="Delete">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                                            </svg>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
+<thead class="bg-gray-50">
+    <tr>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class Name</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room Number</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+    </tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-200">
+    <?php foreach ($classes as $class): ?>
+        <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                    <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                            <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($class['class_name']); ?></div>
+                        <div class="text-sm text-gray-500"><?php echo $class['students_count'] ?? 0; ?> students</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <?php echo htmlspecialchars($class['room_no'] ?? ''); ?>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    ID: <?php echo $class['id']; ?>
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex justify-end space-x-2">
+                    <a href="admin_classes.php?edit=<?php echo $class['id']; ?>" class="text-blue-600 hover:text-blue-900 transition-colors p-2 rounded-lg hover:bg-blue-50" title="Edit">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                    </a>
+                    
+                    <form method="post" class="inline" onsubmit="return confirm('Are you sure you want to delete this class? All related subjects and student data will be permanently removed.');">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                        <input type="hidden" name="delete_id" value="<?php echo $class['id']; ?>">
+                        <button type="submit" name="delete" class="text-red-600 hover:text-red-900 transition-colors p-2 rounded-lg hover:bg-red-50" title="Delete">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+</tbody>
                             </table>
                             
                             <?php if (empty($classes)): ?>
