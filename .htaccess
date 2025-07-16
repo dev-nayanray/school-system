@@ -1,0 +1,22 @@
+# Enable URL rewriting
+RewriteEngine On
+
+# Redirect all requests to index.php for front controller pattern
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
+
+# Set default charset
+AddDefaultCharset UTF-8
+
+# Security headers
+Header set X-Content-Type-Options "nosniff"
+Header set X-Frame-Options "DENY"
+Header set X-XSS-Protection "1; mode=block"
+
+# Disable directory browsing
+Options -Indexes
+
+# Custom error documents
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
