@@ -53,12 +53,7 @@ switch ($role) {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Sidebar</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -66,6 +61,21 @@ switch ($role) {
             --sidebar-width: 260px;
             --header-height: 64px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --sidebar-text-color: rgba(255, 255, 255, 0.9);
+            --sidebar-text-hover-bg: rgba(255, 255, 255, 0.15);
+            --sidebar-text-hover-color: white;
+            --sidebar-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --sidebar-shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --sidebar-border-radius: 10px;
+            --sidebar-padding: 24px 16px;
+            --sidebar-gap: 14px;
+            --sidebar-font-size: 15px;
+            --sidebar-font-weight: 500;
+            --sidebar-icon-size: 20px;
+            --sidebar-icon-font-size: 18px;
+            --sidebar-footer-color: rgba(255, 255, 255, 0.7);
+            --sidebar-footer-hover-bg: rgba(255, 255, 255, 0.1);
+            --sidebar-footer-font-size: 14px;
         }
         
         * {
@@ -140,20 +150,20 @@ switch ($role) {
             height: 100vh;
             width: var(--sidebar-width);
             flex-shrink: 0;
-            z-index: 110; /* Increased z-index for better stacking */
+            
             box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1); /* Added subtle shadow on right edge */
         }
         
         /* Sidebar Component */
         .sidebar {
             background: var(--sidebar-bg);
-            color: white;
+            color: var(--sidebar-text-color);
             height: 100%;
-            padding: 24px 16px;
+            padding: var(--sidebar-padding);
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--sidebar-shadow);
             transition: var(--transition);
         }
         
@@ -204,8 +214,8 @@ switch ($role) {
             padding: 12px 16px 12px 40px;
             background: rgba(255, 255, 255, 0.15);
             border: none;
-            border-radius: 10px;
-            color: white;
+            border-radius: var(--sidebar-border-radius);
+            color: var(--sidebar-text-color);
             font-size: 14px;
             transition: var(--transition);
             backdrop-filter: blur(5px);
@@ -233,31 +243,33 @@ switch ($role) {
         #sidebar-menu li a {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: var(--sidebar-gap);
             padding: 12px 16px;
-            border-radius: 10px;
-            color: rgba(255, 255, 255, 0.9);
+            border-radius: var(--sidebar-border-radius);
+            color: var(--sidebar-text-color);
             text-decoration: none;
-            font-size: 15px;
-            font-weight: 500;
+            font-size: var(--sidebar-font-size);
+            font-weight: var(--sidebar-font-weight);
             transition: var(--transition);
+            cursor: pointer;
         }
         
         #sidebar-menu li a:hover,
         #sidebar-menu li a.active {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
+            background: var(--sidebar-text-hover-bg);
+            color: var(--sidebar-text-hover-color);
+            box-shadow: var(--sidebar-shadow-hover);
         }
         
         #sidebar-menu li a i {
-            width: 20px;
+            width: var(--sidebar-icon-size);
             text-align: center;
-            font-size: 18px;
+            font-size: var(--sidebar-icon-font-size);
         }
         
         .menu-icon {
-            width: 20px;
-            height: 20px;
+            width: var(--sidebar-icon-size);
+            height: var(--sidebar-icon-size);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -275,15 +287,16 @@ switch ($role) {
             align-items: center;
             gap: 12px;
             padding: 12px 16px;
-            border-radius: 10px;
-            color: rgba(255, 255, 255, 0.7);
+            border-radius: var(--sidebar-border-radius);
+            color: var(--sidebar-footer-color);
             text-decoration: none;
-            font-size: 14px;
+            font-size: var(--sidebar-footer-font-size);
             transition: var(--transition);
+            cursor: pointer;
         }
         
         .footer-link:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--sidebar-footer-hover-bg);
             color: white;
         }
         
@@ -327,7 +340,7 @@ switch ($role) {
         
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--sidebar-shadow-hover);
         }
         
         .card h3 {
@@ -386,8 +399,7 @@ switch ($role) {
             }
         }
     </style>
-</head>
-<body>
+
     <!-- Mobile header -->
     <div class="mobile-header">
         <div class="logo">
@@ -556,5 +568,4 @@ switch ($role) {
             });
         });
     </script>
-</body>
-</html>
+ 

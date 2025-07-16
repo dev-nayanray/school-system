@@ -242,6 +242,34 @@ if (!empty($all_marks)) {
                 
                 <!-- Left column -->
                 <div class="lg:col-span-2 space-y-6">
+
+                    <!-- Exam Routine Section -->
+                    <div class="bg-white rounded-xl shadow-md p-6 overflow-x-auto">
+                        <h2 class="text-xl font-bold mb-4">Exam Routine</h2>
+                        <?php if (!empty($exam_routines)): ?>
+                            <table class="min-w-full divide-y divide-gray-200 table-auto">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Exam Name</th>
+                                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Subject</th>
+                                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Exam Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <?php foreach ($exam_routines as $routine): ?>
+                                        <tr class="hover:bg-gray-100">
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($routine['exam_name']); ?></td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700"><?php echo htmlspecialchars($routine['subject_name']); ?></td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700"><?php echo htmlspecialchars(date('M d, Y', strtotime($routine['exam_date']))); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        <?php else: ?>
+                            <p class="text-gray-500">No exam routine available.</p>
+                        <?php endif; ?>
+                    </div>
+
                     <div class="bg-white rounded-xl shadow-md p-6 overflow-x-auto">
                     <h2 class="text-xl font-bold mb-4">All  Fees</h2>
                     <?php if (!empty($class_fees)): ?>
